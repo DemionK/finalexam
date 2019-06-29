@@ -99,17 +99,16 @@ func UpdateRow(rowID string, name string, email string, status string) (*sql.Row
 	return row, nil
 }
 
-func DeleteRow(rowID string) (*sql.Row, error) {
+func DeleteRow(rowID string) error {
 	db, err := initDB()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer db.Close()
 	deleteByIDTb := `delete from customers where id=$1 RETURNING id;`
-	stmt, err := db.Prepare(deleteByIDTb)
+	_, err = db.Exec(deleteByIDTb, rowID)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	row := stmt.QueryRow(rowID)
-	return row, nil
+	return nil
 }

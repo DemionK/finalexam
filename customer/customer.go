@@ -27,6 +27,11 @@ func PostHandler(c *gin.Context) {
 		return
 	}
 	row, err := database.InsertRow(ct.Name, ct.Email, ct.Status)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Error": http.StatusText(http.StatusInternalServerError)})
+		fmt.Println(err.Error())
+		return
+	}
 	err = row.Scan(&ct.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Error": http.StatusText(http.StatusInternalServerError)})
@@ -95,14 +100,9 @@ func PutHandler(c *gin.Context) {
 
 func DeleteByIDHandler(c *gin.Context) {
 	ID := c.Param("id")
-	row, err := database.DeleteRow(ID)
+	err := database.DeleteRow(ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Error": http.StatusText(http.StatusInternalServerError)})
-		return
-	}
-	err = row.Scan(&ID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": http.StatusText(http.StatusBadRequest)})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "customer deleted"})
